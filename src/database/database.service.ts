@@ -3,11 +3,15 @@ import { User } from '../user/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { plainToClass } from 'class-transformer';
 import { Track } from 'src/track/entities/track.entity';
+import { Artist } from 'src/artist/entities/artist.entity';
+import { Album } from 'src/album/entities/album.entity';
 
 @Injectable()
 export class DatabaseService {
   private users: User[] = [];
   private tracks: Track[] = [];
+  private artists: Artist[] = [];
+  private albums: Album[] = [];
 
   // USERS
   getAllUsers(): User[] {
@@ -78,5 +82,43 @@ export class DatabaseService {
     if (index === -1) throw new NotFoundException('Track not found');
 
     this.tracks.splice(index, 1);
+  }
+
+  // ARTISTS
+  getAllArtists(): Artist[] {
+    return this.artists;
+  }
+
+  findArtistById(id: string): Artist {
+    return this.artists.find((a) => a.id === id);
+  }
+
+  createArtist(artist: Partial<Artist>): Artist {
+    const newArtist = new Artist(artist);
+    this.artists.push(newArtist);
+
+    return newArtist;
+  }
+
+  updateArtist(id: string, updatedFields: Partial<Artist>): Artist {
+    const artist = this.findArtistById(id);
+    if (!artist) throw new NotFoundException(`Artist with ID ${id} not found`);
+
+    Object.assign(artist, updatedFields);
+
+    return artist;
+  }
+
+  deleteArtist(id: string): void {
+    const index = this.artists.findIndex((artist) => artist.id === id);
+    if (index === -1) throw new NotFoundException('Artist not found');
+
+    this.artists.splice(index, 1);
+    this.tracks.forEach((track) => {
+      if (track.artistId === id) track.artistId = null;
+    });
+    this.albums.forEach((album) => {
+      if (album.artistId === id) album.artistId = null;
+    });
   }
 }
