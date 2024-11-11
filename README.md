@@ -8,13 +8,33 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/RoierS/nodejs2024Q3-service.git
 ```
 
-## Installing NPM modules
+- Change folder
+
+```
+cd nodejs2024Q3-service
+```
+
+- Change the branch
+
+```
+git checkout Home-Library/part-1
+
+```
+
+- Installing NPM modules
 
 ```
 npm install
+
+```
+
+- Rename .env.example to .env.
+
+```sh
+cp .env.example .env
 ```
 
 ## Running application
@@ -37,22 +57,36 @@ To run all tests without authorization
 npm run test
 ```
 
-To run only one of all test suites
+To run only one of all test suites:
+
+- users:
 
 ```
-npm run test -- <path to suite>
+npm run test test/users.e2e.spec.ts
 ```
 
-To run all test with authorization
+- tracks:
 
 ```
-npm run test:auth
+npm run test test/tracks.e2e.spec.ts
 ```
 
-To run only specific test suite with authorization
+- albums:
 
 ```
-npm run test:auth -- <path to suite>
+npm run test test/albums.e2e.spec.ts
+```
+
+- artists:
+
+```
+npm run test test/artists.e2e.spec.ts
+```
+
+- favorites:
+
+```
+npm run test test/favorites.e2e.spec.ts
 ```
 
 ### Auto-fix and format
