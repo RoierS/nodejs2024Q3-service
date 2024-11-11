@@ -5,6 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { Track } from 'src/track/entities/track.entity';
 import { Artist } from 'src/artist/entities/artist.entity';
 import { Album } from 'src/album/entities/album.entity';
+import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
 
 @Injectable()
 export class DatabaseService {
@@ -119,6 +120,44 @@ export class DatabaseService {
     });
     this.albums.forEach((album) => {
       if (album.artistId === id) album.artistId = null;
+    });
+  }
+
+  // ALBUMS
+  getAllAlbums(): Album[] {
+    return this.albums;
+  }
+
+  findAlbumById(id: string): Album {
+    const album = this.albums.find((a) => a.id === id);
+    if (!album) throw new NotFoundException('Album not found');
+
+    return album;
+  }
+
+  createAlbum(albumData: CreateAlbumDto): Album {
+    const newAlbum = new Album({ id: uuidv4(), ...albumData });
+    this.albums.push(newAlbum);
+
+    return newAlbum;
+  }
+
+  updateAlbum(id: string, updatedFields: Partial<Album>): Album {
+    const album = this.findAlbumById(id);
+    if (!album) throw new NotFoundException(`Album with ID ${id} not found`);
+
+    Object.assign(album, updatedFields);
+
+    return album;
+  }
+
+  deleteAlbum(id: string): void {
+    const index = this.albums.findIndex((album) => album.id === id);
+    if (index === -1) throw new NotFoundException('Album not found');
+
+    this.albums.splice(index, 1);
+    this.tracks.forEach((track) => {
+      if (track.albumId === id) track.albumId = null;
     });
   }
 }
