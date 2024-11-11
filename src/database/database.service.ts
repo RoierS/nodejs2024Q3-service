@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { plainToClass } from 'class-transformer';
@@ -6,6 +11,9 @@ import { Track } from 'src/track/entities/track.entity';
 import { Artist } from 'src/artist/entities/artist.entity';
 import { Album } from 'src/album/entities/album.entity';
 import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
+import { Favorites } from 'src/favorites/entities/favorites.entity';
+
+export type FavoriteType = 'artists' | 'albums' | 'tracks';
 
 @Injectable()
 export class DatabaseService {
@@ -13,6 +21,7 @@ export class DatabaseService {
   private tracks: Track[] = [];
   private artists: Artist[] = [];
   private albums: Album[] = [];
+  private favorites: Favorites = new Favorites();
 
   // USERS
   getAllUsers(): User[] {
@@ -38,6 +47,8 @@ export class DatabaseService {
 
   updateUser(id: string, updatedFields: Partial<User>): User {
     const user = this.findUserById(id);
+    if (!user) throw new NotFoundException('User not found');
+
     Object.assign(user, updatedFields);
     user.version++;
     user.updatedAt = Date.now();
@@ -83,6 +94,7 @@ export class DatabaseService {
     if (index === -1) throw new NotFoundException('Track not found');
 
     this.tracks.splice(index, 1);
+    this.removeFromFavorites(id, 'tracks');
   }
 
   // ARTISTS
@@ -121,6 +133,7 @@ export class DatabaseService {
     this.albums.forEach((album) => {
       if (album.artistId === id) album.artistId = null;
     });
+    this.removeFromFavorites(id, 'artists');
   }
 
   // ALBUMS
@@ -156,8 +169,68 @@ export class DatabaseService {
     if (index === -1) throw new NotFoundException('Album not found');
 
     this.albums.splice(index, 1);
+    this.removeFromFavorites(id, 'albums');
     this.tracks.forEach((track) => {
       if (track.albumId === id) track.albumId = null;
     });
+  }
+
+  // FAVORITES
+
+  getAllFavorites() {
+    return {
+      artists: this.favorites.artists.map((id) =>
+        this.artists.find((artist) => artist.id === id),
+      ),
+      albums: this.favorites.albums.map((id) =>
+        this.albums.find((album) => album.id === id),
+      ),
+      tracks: this.favorites.tracks.map((id) =>
+        this.tracks.find((track) => track.id === id),
+      ),
+    };
+  }
+
+  addFavorite(type: FavoriteType, id: string) {
+    if (!this.validateEntityExists(type, id)) {
+      throw new UnprocessableEntityException(
+        `${type.slice(0, -1)} with ID ${id} not found`,
+      );
+    }
+
+    if (!this.favorites[type].includes(id)) {
+      this.favorites[type].push(id);
+    } else {
+      throw new BadRequestException(
+        `${type.slice(0, -1)} with ID ${id} already in favorites`,
+      );
+    }
+  }
+
+  private removeFromFavorites(id: string, type: FavoriteType) {
+    const index = this.favorites[type].indexOf(id);
+    if (index !== -1) this.favorites[type].splice(index, 1);
+  }
+
+  removeFavorite(type: FavoriteType, id: string) {
+    const index = this.favorites[type].indexOf(id);
+    if (index === -1)
+      throw new NotFoundException(
+        `${type.slice(0, -1)} with ID ${id} is not in favorites`,
+      );
+    this.favorites[type].splice(index, 1);
+  }
+
+  private validateEntityExists(type: FavoriteType, id: string): boolean {
+    switch (type) {
+      case 'artists':
+        return !!this.artists.find((artist) => artist.id === id);
+      case 'albums':
+        return !!this.albums.find((album) => album.id === id);
+      case 'tracks':
+        return !!this.tracks.find((track) => track.id === id);
+      default:
+        return false;
+    }
   }
 }
