@@ -29,7 +29,7 @@ export class UserController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   getUserById(@Param('id', ParseUUIDPipe) id: string) {
-    return this.userService.findOne(id);
+    return plainToClass(User, this.userService.findOne(id));
   }
 
   @Post()
