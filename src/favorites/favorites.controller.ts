@@ -9,9 +9,6 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
-import { Artist } from '../artist/entities/artist.entity';
-import { Album } from '../album/entities/album.entity';
-import { Track } from '../track/entities/track.entity';
 
 @Controller('favs')
 export class FavoritesController {
@@ -19,7 +16,7 @@ export class FavoritesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  getAllFavorites(): { artists: Artist[]; albums: Album[]; tracks: Track[] } {
+  getAllFavorites() {
     return this.favoritesService.getAllFavorites();
   }
 
