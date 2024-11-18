@@ -13,6 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "start:app": "npx prisma generate && npx prisma migrate dev --name init && npm run start:dev",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --testMatch \"<rootDir>/*.spec.ts\" --noStackTrace --runInBand",
     "test:auth": "cross-env TEST_MODE=auth jest --testPathIgnorePatterns refresh.e2e.spec.ts --noStackTrace --runInBand",
@@ -23,6 +24,7 @@
     "docker:up": "docker-compose up",
     "docker:down": "docker-compose down",
     "docker:build": "docker-compose build",
+    "docker:test": "docker exec my-home-library-app npm run test",
     "migrate:dev": "npx prisma migrate dev --name init"
   },
   "dependencies": {
