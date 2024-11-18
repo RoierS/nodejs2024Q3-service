@@ -25,6 +25,8 @@
     "docker:down": "docker-compose down",
     "docker:build": "docker-compose build",
     "docker:test": "docker exec my-home-library-app npm run test",
+    "docker:scout:app": "docker scout cves roiers/home-library:app",
+    "docker:scout:db": "docker scout cves roiers/home-library:db",
     "migrate:dev": "npx prisma migrate dev --name init"
   },
   "dependencies": {
