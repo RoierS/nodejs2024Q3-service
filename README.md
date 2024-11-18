@@ -20,7 +20,7 @@ cd nodejs2024Q3-service
 - Change the branch
 
 ```
-git checkout Home-Library/part-1
+git checkout Home-Library/part-2
 
 ```
 
@@ -39,8 +39,10 @@ cp .env.example .env
 
 ## Running application
 
+⚠️ Attencion: Before start, remove all container and images in Docker Desktop!
+
 ```
-npm start
+npm run docker:up
 ```
 
 After starting the app on port (4000 as default) you can open
@@ -55,6 +57,12 @@ To run all tests without authorization
 
 ```
 npm run test
+```
+
+or
+
+```
+npm run docker:test
 ```
 
 To run only one of all test suites:
@@ -99,8 +107,22 @@ npm run lint
 npm run format
 ```
 
+### To scan for vulnerabilities:
+
+```
+npm run docker:scout:app
+```
+
+```
+npm run docker:scout:db
+```
+
 ### Debugging in VSCode
 
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+## Link to dockerHub images:
+
+https://hub.docker.com/repository/docker/roiers/home-library/tags
