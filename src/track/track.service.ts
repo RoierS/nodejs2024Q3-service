@@ -1,47 +1,61 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database.service';
 
-import { v4 as uuidv4 } from 'uuid';
 import { Track } from './entities/track.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  getAllTracks(): Track[] {
-    return this.databaseService.getAllTracks();
+  async getAllTracks(): Promise<Track[]> {
+    return await this.prisma.track.findMany();
   }
 
-  findTrackById(id: string): Track {
-    return this.databaseService.findTrackById(id);
+  async findTrackById(id: string): Promise<Track> {
+    const track = await this.prisma.track.findUnique({ where: { id } });
+
+    if (!track) throw new NotFoundException('Track not found');
+
+    return track;
   }
 
-  createTrack(trackData: Partial<Track>): Track {
-    const newTrack = new Track({
-      id: uuidv4(),
-      ...trackData,
+  async createTrack(trackData: Partial<Track>): Promise<Track> {
+    const newTrack = await this.prisma.track.create({
+      data: {
+        name: trackData.name,
+        artistId: trackData.artistId,
+        albumId: trackData.albumId,
+        duration: trackData.duration,
+      },
     });
 
-    return this.databaseService.createTrack(newTrack);
+    return newTrack;
   }
 
-  updateTrack(id: string, updatedFields: Partial<Track>): Track {
-    const existingTrack = this.databaseService.findTrackById(id);
+  async updateTrack(id: string, updatedFields: Partial<Track>): Promise<Track> {
+    const existingTrack = await this.prisma.track.findUnique({ where: { id } });
 
     if (!existingTrack) {
       throw new NotFoundException('Track not found');
     }
 
-    return this.databaseService.updateTrack(id, updatedFields);
+    const updatedTrack = await this.prisma.track.update({
+      where: { id },
+      data: {
+        ...updatedFields,
+      },
+    });
+
+    return updatedTrack;
   }
 
-  deleteTrack(id: string): void {
-    const track = this.databaseService.findTrackById(id);
+  async deleteTrack(id: string): Promise<void> {
+    const track = await this.prisma.track.findUnique({ where: { id } });
 
     if (!track) {
       throw new NotFoundException('Track not found');
     }
 
-    this.databaseService.deleteTrack(id);
+    await this.prisma.track.delete({ where: { id } });
   }
 }
