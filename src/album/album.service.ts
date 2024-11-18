@@ -39,7 +39,7 @@ export class AlbumService {
 
     return await this.prisma.album.update({
       where: { id },
-      data: { ...updatedFields },
+      data: { ...existingAlbum, ...updatedFields },
     });
   }
 
