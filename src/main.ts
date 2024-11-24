@@ -4,9 +4,13 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { loadApiDocumentation } from './utils';
+import { LoggingService } from './logging/logging.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const loggingService = app.get(LoggingService);
+  app.useLogger(loggingService);
+
   app.useGlobalPipes(new ValidationPipe());
 
   const configService = app.get(ConfigService);
