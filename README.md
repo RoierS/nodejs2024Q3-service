@@ -8,19 +8,41 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/RoierS/nodejs2024Q3-service.git
 ```
 
-## Installing NPM modules
+- Change folder
+
+```
+cd nodejs2024Q3-service
+```
+
+- Change the branch
+
+```
+git checkout Home-Library/part-2
+
+```
+
+- Installing NPM modules
 
 ```
 npm install
+
+```
+
+- Rename .env.example to .env.
+
+```sh
+cp .env.example .env
 ```
 
 ## Running application
 
+⚠️ Attencion: Before start, remove all container and images in Docker Desktop!
+
 ```
-npm start
+npm run docker:up
 ```
 
 After starting the app on port (4000 as default) you can open
@@ -37,22 +59,42 @@ To run all tests without authorization
 npm run test
 ```
 
-To run only one of all test suites
+or
 
 ```
-npm run test -- <path to suite>
+npm run docker:test
 ```
 
-To run all test with authorization
+To run only one of all test suites:
+
+- users:
 
 ```
-npm run test:auth
+npm run test test/users.e2e.spec.ts
 ```
 
-To run only specific test suite with authorization
+- tracks:
 
 ```
-npm run test:auth -- <path to suite>
+npm run test test/tracks.e2e.spec.ts
+```
+
+- albums:
+
+```
+npm run test test/albums.e2e.spec.ts
+```
+
+- artists:
+
+```
+npm run test test/artists.e2e.spec.ts
+```
+
+- favorites:
+
+```
+npm run test test/favorites.e2e.spec.ts
 ```
 
 ### Auto-fix and format
@@ -65,8 +107,22 @@ npm run lint
 npm run format
 ```
 
+### To scan for vulnerabilities:
+
+```
+npm run docker:scout:app
+```
+
+```
+npm run docker:scout:db
+```
+
 ### Debugging in VSCode
 
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+## Link to dockerHub images:
+
+https://hub.docker.com/repository/docker/roiers/home-library/tags
