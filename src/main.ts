@@ -21,6 +21,22 @@ async function bootstrap() {
   const apiDoc = await loadApiDocumentation();
   SwaggerModule.setup('doc', app, apiDoc);
 
+  process.on('uncaughtException', (err: Error) => {
+    loggingService.error(
+      `Uncaught Exception: ${err.message}`,
+      err.stack,
+      'Process',
+    );
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    loggingService.error(
+      `Unhandled Rejection: ${reason}`,
+      undefined,
+      'Process',
+    );
+  });
+
   await app.listen(port, () => {
     console.log(`\x1b[35m 🚀 App is running on port ${port}! \x1b[0m`);
   });
