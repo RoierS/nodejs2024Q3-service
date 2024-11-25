@@ -61,9 +61,9 @@ export class LoggingService implements LoggerService {
     trace?: string,
   ) {
     const date = new Date().toISOString();
-    const logMessage = `[${date}] [${level}] ${message} ${
-      context ? `context: ${context}` : ''
-    } ${trace ? `trace: ${trace}` : ''}`;
+    const logMessage = `${date} [${level.toUpperCase()}] ${
+      context ? `[${context}] ` : ''
+    }${message}${trace ? `\n${trace}` : ''}`;
 
     console.log(logMessage);
 
@@ -72,6 +72,7 @@ export class LoggingService implements LoggerService {
 
   private writeToFile(level: LogLevel, message: string) {
     const logDir = path.join(__dirname, '../logs');
+
     if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
 
     const logFile =

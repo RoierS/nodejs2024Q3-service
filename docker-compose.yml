@@ -42,6 +42,7 @@ services:
       - db
     volumes:
       - ./src:/app/src
+      - ./logs:/app/logs
     networks:
       - my-home-library
 
